@@ -25,28 +25,21 @@ def export_sprite(sprite: Image, name: str):
     colors = {tuple(color): i for i, color in enumerate(normalized_colors)}
 
     # Write the data in a binary file
-    with open (path.join(DATA_PATH, f'{name}.data'), 'wb') as file:
+    with open (path.join(DATA_PATH, f'{name}.data'), 'w') as file:
         # Write quantity of colors and dimensions
-        file.write(struct.pack('IHH', len(normalized_colors), width, height))
+        file.write(f'Color quantity: {len(normalized_colors)}\nWidth: {width}\nHeight: {height}\n')
         # Write the colors
+        file.write('\nColors in RGBA:\n\n')
         for color in normalized_colors:
-            file.write(struct.pack('4f', *color))
+            file.write(f'{{ {color[0]}, {color[1]}, {color[2]}, {color[3]} }},\n')
         # Write the pixels
+        file.write('\nPixel map:\n\n')
+        file.write('{')
         for row in pixels:
-            file.write(b'\n')
+            file.write('\n')
             for pixel in row:
-                file.write(struct.pack('B', colors[tuple(normalize_rgbacolor(pixel))]))
-
-def read_data_file(name: str):
-    with open(path.join(DATA_PATH, f'{name}.data'), 'rb') as file:
-        # Read quantity of colors and dimensions
-        colors, width, height = struct.unpack('IHH', file.read(8))
-        # Read the colors
-        color_list = [struct.unpack('4f', file.read(16)) for _ in range(colors)]
-        # Read the pixels
-        pixels = np.array([[struct.unpack('B', file.read(1))[0] for _ in range(width)] for _ in range(height)])
-        # print all the data
-        print(f'Colors: {colors}\nWidth: {width}\nHeight: {height}\nColor list: {color_list}\nPixels: {pixels}')
+                file.write(f'{str(colors[tuple(normalize_rgbacolor(pixel))])},')
+        file.write('\n}')
 
 if __name__ == '__main__':
     print('''Reading sprites names separated by spaces:''')
@@ -61,7 +54,6 @@ if __name__ == '__main__':
 
     # Read the sprites
     for name in names:
-        # read_data_file(name)
         print(f'Exporting {name} in {DATA_PATH} as {name}.data')
         sprite = Image.open(path.join(SPRITES_PATH, f'{name}.png'))
         export_sprite(sprite, name)

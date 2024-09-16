@@ -6,6 +6,7 @@ add_subdirectory("external/rusty_audio")
 add_subdirectory("external/nothofagus")
 
 file(GLOB_RECURSE HEADERS "source/*.h" "include/*.h")
+file(GLOB_RECURSE RESOURCES "resources/data/*")
 
 add_executable(skifri
     "source/piano.cpp"
@@ -20,4 +21,14 @@ target_include_directories(skifri PRIVATE
     ${RUSTY_AUDIO_INCLUDE}
     ${NOTHOFAGUS_INCLUDE}
 )
+
+# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/data/a.txt
+#     ${CMAKE_CURRENT_BINARY_DIR}/a.txt
+# )
+foreach(resource ${RESOURCES})
+    get_filename_component(resource_name ${resource} NAME)
+    configure_file(${resource} ${CMAKE_CURRENT_BINARY_DIR}/resources/${resource_name} COPYONLY)
+endforeach(resource ${RESOURCES})
+
+
 target_link_libraries(skifri PRIVATE rusty_audio nothofagus)

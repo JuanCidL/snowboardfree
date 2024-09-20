@@ -1,22 +1,72 @@
-#include <nothofagus.h>
 #pragma once
+#include <nothofagus.h>
 
 namespace Entity
 {
 
+extern glm::vec2& zeroVec2;
+
+class BoundingBox
+{
+public:
+    BoundingBox() :
+        lbCorner{0, 0},
+        rtCorner{0, 0}
+    {}
+
+    glm::vec2& leftBottomCorner()
+    {
+        return lbCorner;
+    }
+    
+    const glm::vec2& leftBottomCorner() const
+    {
+        return lbCorner;
+    }
+
+    glm::vec2& rightTopCorner()
+    {
+        return rtCorner;
+    }
+
+    const glm::vec2& rightTopCorner() const
+    {
+        return rtCorner;
+    }
+    
+private:
+    glm::vec2 lbCorner, rtCorner;
+};
+
 class Entity
 {
 public:
-    Entity(glm::ivec2 dimensions, glm::vec2 position);
+    Entity();
 
-
-    const glm::vec2 position() const { return _position; }
-    glm::vec2& position() { return _position; }
-
+    virtual void update(float dt);
+    bool checkCollision(const Entity& other) const;
+    virtual const glm::vec2& position() const;
+    virtual const BoundingBox& boundingBox() const;
 
 protected:
+    BoundingBox _boundingBox;
+private:
     glm::vec2 _position;
-    glm::ivec2 _dimensions;
+};
+
+class StaticEntity : public Entity
+{
+public:
+    StaticEntity(
+        glm::ivec2 dimensions, glm::vec2 position,
+        std::initializer_list<glm::vec4>colors,
+        std::initializer_list<std::uint8_t> sprite);
+
+    void update(float dt) override;
+    const glm::vec2& position() const override;
+    
+protected:
+    Nothofagus::BellotaId bellotaId;
 };
 
 
@@ -24,15 +74,14 @@ class AnimatedEntity : public Entity
 {
 public:
     AnimatedEntity(
-        Nothofagus::Canvas& canvas,
         glm::ivec2 dimensions, glm::vec2 position,
         std::initializer_list<glm::vec4> colors,
         std::initializer_list<std::initializer_list<std::uint8_t>> sprites);
 
+    void update(float dt) override;
+    const glm::vec2& position() const override;
 
 protected:
-    glm::vec2 position;
-    glm::ivec2 dimensions;
     std::vector<Nothofagus::BellotaId> bellotaIds;
     Nothofagus::BellotaId currentBellotaId;
 };

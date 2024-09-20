@@ -1,31 +1,25 @@
-#include "entity.h"
 #pragma once
+#include "entity.h"
 
 namespace Entity
 {
 
-enum PlayerState
-{
-    IDLE,
-    Left,
-    LeftDown,
-    Right,
-    RightDown,
-    Down,
-};
 
 class PlayerEntity : public AnimatedEntity
 {
 public:
-    PlayerEntity(
-        Nothofagus::Canvas& canvas, glm::vec2 position);
+    PlayerEntity();
     
     void setupController(Nothofagus::Controller& controller);
 
-    void update(Nothofagus::Canvas& canvas, float dt);
+    void update(float dt) override;
 private:
-    int state;
-    bool updated;
+    bool leftKeyPressed;
+    bool rightKeyPressed;
+    bool downKeyPressed;
+    glm::vec2 maxVelocity;
+    float acceleration;
+    float deceleration;
 };
 
 }

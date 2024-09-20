@@ -1,13 +1,14 @@
 #include "player.h"
 #include <nothofagus.h>
 #include <iostream>
+#include "game.h"
 
 namespace Entity
 {
 
-PlayerEntity::PlayerEntity(Nothofagus::Canvas& canvas, glm::vec2 position) :
+PlayerEntity::PlayerEntity() :
     AnimatedEntity(
-        canvas, {32, 32}, position,
+        {32, 32}, Game::playerPosition,
         {
             { 0.5607843137254902, 0.592156862745098, 0.2901960784313726, 1.0 },
             { 0.00392156862745098, 0.00392156862745098, 0.00392156862745098, 1.0 },
@@ -126,46 +127,136 @@ PlayerEntity::PlayerEntity(Nothofagus::Canvas& canvas, glm::vec2 position) :
             }
         }
 
-    ), updated(false)
+    ), leftKeyPressed(false), rightKeyPressed(false), downKeyPressed(false),
+    maxVelocity({13.0f, 18.0f}), acceleration(4.2f), deceleration(5.0f)
 {
-    state = PlayerState::IDLE;
+    _boundingBox.leftBottomCorner() = {-5.0f, -4.0f};
+    _boundingBox.rightTopCorner() = {5.0f, 4.0f};
 };
 
 void PlayerEntity::setupController(Nothofagus::Controller& controller)
 {
     controller.registerAction({ Nothofagus::Key::A, Nothofagus::DiscreteTrigger::Press }, [&]()
     {
-        state = PlayerState::Left;
-        updated = true;
-
+        leftKeyPressed = true;
     });
     controller.registerAction({ Nothofagus::Key::S, Nothofagus::DiscreteTrigger::Press }, [&]()
     {
-        state = PlayerState::Down;
-        updated = true;
+        downKeyPressed = true;
     });
     controller.registerAction({ Nothofagus::Key::D, Nothofagus::DiscreteTrigger::Press }, [&]()
     {
-        state = PlayerState::Right;
-        updated = true;
+        rightKeyPressed = true;
+    });
+
+    controller.registerAction({ Nothofagus::Key::A, Nothofagus::DiscreteTrigger::Release }, [&]()
+    {
+        leftKeyPressed = false;
+    });
+    controller.registerAction({ Nothofagus::Key::S, Nothofagus::DiscreteTrigger::Release }, [&]()
+    {
+        downKeyPressed = false;
+    });
+    controller.registerAction({ Nothofagus::Key::D, Nothofagus::DiscreteTrigger::Release }, [&]()
+    {
+        rightKeyPressed = false;
     });
 }
 
-void PlayerEntity::update(Nothofagus::Canvas& canvas, float dt)
+void PlayerEntity::update(float dt)
 {
-    if (updated)
+    if (leftKeyPressed && rightKeyPressed) return;
+    if (downKeyPressed)
     {
-        switch (state)
+        if (leftKeyPressed)
         {
-        case PlayerState::Left:
-            canvas.bellota(currentBellotaId).depthOffset() = -1;
+            Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
             currentBellotaId = this->bellotaIds[1];
-            canvas.bellota(currentBellotaId).depthOffset() = 1;
-            canvas.bellota(currentBellotaId).transform().scale().x = -abs(canvas.bellota(currentBellotaId).transform().scale().x);
-            break;
+            Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+            Game::canvas.bellota(currentBellotaId).transform().scale().x = -abs(Game::canvas.bellota(currentBellotaId).transform().scale().x);
+            
+            if (Game::velocity.y < maxVelocity.x)
+                Game::velocity.y += acceleration * dt / 1000;
+            else
+                Game::velocity.y = maxVelocity.x;
+            if (Game::velocity.x < maxVelocity.y)
+                Game::velocity.x += acceleration * dt / 500;
+            else
+                Game::velocity.x = maxVelocity.y;
         }
-        updated = false;
-        std::cout << state << std::endl;
+        else if (rightKeyPressed)
+        {
+            Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+            currentBellotaId = this->bellotaIds[1];
+            Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+            Game::canvas.bellota(currentBellotaId).transform().scale().x = abs(Game::canvas.bellota(currentBellotaId).transform().scale().x);
+            
+            if (Game::velocity.y < maxVelocity.x)
+                Game::velocity.y += acceleration * dt / 1000;
+            else
+                Game::velocity.y = maxVelocity.x;
+            if (Game::velocity.x > -maxVelocity.y)
+                Game::velocity.x -= acceleration * dt / 500;
+            else
+                Game::velocity.x = -maxVelocity.y;
+        }
+        else
+        {
+            Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+            currentBellotaId = this->bellotaIds[0];
+            Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+            
+            if (Game::velocity.y < maxVelocity.y)
+                Game::velocity.y += acceleration * dt / 1000;
+            else
+                Game::velocity.y = maxVelocity.y;
+            if (Game::velocity.x > 0)
+                Game::velocity.x -= deceleration * dt / 250;
+            else if (Game::velocity.x < 0)
+                Game::velocity.x += deceleration * dt / 250;
+            else
+                Game::velocity.x = 0;
+        }
+    }
+    else
+    {
+        if (leftKeyPressed)
+        {
+            Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+            currentBellotaId = this->bellotaIds[2];
+            Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+            Game::canvas.bellota(currentBellotaId).transform().scale().x = -abs(Game::canvas.bellota(currentBellotaId).transform().scale().x);
+
+            if (Game::velocity.y > 0)
+                Game::velocity.x += acceleration * dt / 250;
+        }
+        else if (rightKeyPressed)
+        {
+            Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+            currentBellotaId = this->bellotaIds[2];
+            Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+            Game::canvas.bellota(currentBellotaId).transform().scale().x = abs(Game::canvas.bellota(currentBellotaId).transform().scale().x);
+
+            if (Game::velocity.y > 0)
+                Game::velocity.x -= acceleration * dt / 250;
+        }
+        else
+        {
+            Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+            currentBellotaId = this->bellotaIds[0];
+            Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+        }
+
+        if (Game::velocity.y > 0)
+            Game::velocity.y -= deceleration * dt / 1000;
+        else
+            Game::velocity.y = 0;
+        if (Game::velocity.x > 0)
+            Game::velocity.x -= deceleration * dt / 250;
+        else if (Game::velocity.x < 0)
+            Game::velocity.x += deceleration * dt / 250;
+        else
+            Game::velocity.x = 0;
     }
 }
 

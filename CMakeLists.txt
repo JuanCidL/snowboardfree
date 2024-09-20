@@ -10,12 +10,15 @@ file(GLOB_RECURSE HEADERS "source/*.h" "include/*.h")
 
 add_executable(skifri
     "source/piano.cpp"
-    "source/utils/sprite_data.cpp"
     "source/main.cpp"
+    "source/game.cpp"
     "source/entity/entity.cpp"
     "source/entity/animated_entity.cpp"
+    "source/entity/static_entity.cpp"
+    "source/entity/ramp.cpp"
+    "source/entity/tree.cpp"
     "source/entity/player.cpp"
-
+    
     ${HEADERS}
 )
 

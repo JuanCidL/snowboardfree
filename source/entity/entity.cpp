@@ -4,10 +4,14 @@
 namespace Entity
 {
 
-Entity::Entity() {};
+Entity::Entity(): canCollide(true) {};
 
 bool Entity::checkCollision(const Entity& other) const 
 {
+    if (!canCollide || !other.canCollide)
+    {
+        return false;
+    }
     return (
         position().x + boundingBox().leftBottomCorner().x < other.position().x + other.boundingBox().rightTopCorner().x &&
         position().x + boundingBox().rightTopCorner().x > other.position().x + other.boundingBox().leftBottomCorner().x &&

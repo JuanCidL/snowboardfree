@@ -28,10 +28,12 @@ void StaticEntity::update(float dt)
 {
     auto& bellota = Game::canvas.bellota(this->bellotaId);
     bellota.transform().location() += Game::velocity * dt / 50.0f;
+
     if (bellota.transform().location().y > Game::CANVAS_HEIGHT+64)
     {
         bellota.transform().location().x = Game::disX(Game::gen);
         bellota.transform().location().y = Game::disY(Game::gen);
+        canCollide = true;
     }
 };
 

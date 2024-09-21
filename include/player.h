@@ -13,6 +13,11 @@ public:
     void setupController(Nothofagus::Controller& controller);
 
     void update(float dt) override;
+
+    void jump();
+    
+    void crash();
+
 private:
     bool leftKeyPressed;
     bool rightKeyPressed;
@@ -20,6 +25,12 @@ private:
     glm::vec2 maxVelocity;
     float acceleration;
     float deceleration;
+    bool isJumping;
+    float jumpVelocity;
+    float maxJumpVelocity;
+    float jumpHeight;
+    float crashTime;
+    float crashDuration;
 };
 
 }

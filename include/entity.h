@@ -47,6 +47,7 @@ public:
     bool checkCollision(const Entity& other) const;
     virtual const glm::vec2& position() const;
     virtual const BoundingBox& boundingBox() const;
+    bool canCollide;
 
 protected:
     BoundingBox _boundingBox;

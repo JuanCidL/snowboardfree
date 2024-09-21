@@ -52,11 +52,18 @@ void update(float dt)
         if (ramp.checkCollision(player))
         {
             std::cout << "Collision detected" << std::endl;
+            player.jump();
         }
     }
     for (auto& tree : trees)
     {
         tree.update(dt);
+        if (tree.checkCollision(player))
+        {
+            std::cout << "Collision detected" << std::endl;
+            tree.canCollide = false;
+            player.crash();
+        }
     }
 }
 

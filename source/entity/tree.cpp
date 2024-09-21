@@ -1,4 +1,5 @@
 #include "obstacles.h"
+#include "game.h"
 
 namespace Entity
 {
@@ -46,6 +47,10 @@ Tree::Tree(glm::vec2 position) :
             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
         }
-) {};
+) {
+    _boundingBox.leftBottomCorner() = { -8, -12 };
+    _boundingBox.rightTopCorner() = { 8, -3 };
+    Game::canvas.bellota(this->bellotaId).depthOffset() = 10;
+};
 
 }

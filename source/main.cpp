@@ -14,46 +14,36 @@
 
 int main()
 {
-    //constexpr unsigned int sampleRate = 48000;
-    //constexpr unsigned int channels = 2;
+    // Jump sound
+    RustyAudio::Builder jumpSoundBuilder;
+    jumpSoundBuilder.appendSinusoids({
+        {50, 0.3, Piano::keys["C3"]},
+        {30, 0.3, Piano::keys["E3"]},
+        {20, 0.3, Piano::keys["G3"]},
+        {40, 0.3, Piano::keys["C4"]},
+        {60, 0.3, Piano::keys["E4"]},
+        {70, 0.3, Piano::keys["G4"]},
+    });
+    RustyAudio::Buffer jumpSoundBuffer = jumpSoundBuilder.generate(Piano::sampleRate, Piano::channels);
+    auto jumpSoundPlayer = std::make_unique<RustyAudio::Player>();
+    jumpSoundPlayer->init(jumpSoundBuffer);
+    Piano::addSound("jump", std::move(jumpSoundPlayer));
 
-    //const Piano::Key& key = Piano::Key::getInstance();
-
-    //RustyAudio::Builder soundBuilder;
-    //soundBuilder.appendSinusoids({
-    //    {100, 0.5, key.getKey("C1")},
-    //    // {500, 0.5, 700},
-    //    // {300, 0.5, 600},
-    //    // {100, 0.5, 600},
-    //    // {500, 0.5, 700},
-    //    // {300, 0.5, 600},
-    //    // {100, 0.5, 600},
-    //    // {500, 0.5, 700},
-    //    // {300, 0.5, 600},
-    //});
-
-    //RustyAudio::Buffer soundBuffer = soundBuilder.generate(sampleRate, channels);
-
-    //RustyAudio::Player soundPlayer;
-    //soundPlayer.init(soundBuffer);
-
-    // Nothofagus
 
     
     float time = 0.0f;
 
     Game::setup();
 
+    // Game::piano.playSound("jump");
+
     auto update = [&](float dt)
         {
             time += dt;
-            std::cout<<Game::velocity.y<<std::endl;
             Game::update(dt);
             Game::setupGui();
         };
 
-    /*soundPlayer.setLooping(true);
-    soundPlayer.play();*/
 
     Game::canvas.run(update, Game::controller);
     

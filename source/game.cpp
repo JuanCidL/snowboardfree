@@ -4,6 +4,8 @@ namespace Game {
 
 bool paused = false;
 
+std::unordered_map<std::string, std::unique_ptr<RustyAudio::Player>> sounds;
+
 Nothofagus::BellotaId pauseBackgroundBellotaId = { 0 };
 Nothofagus::BellotaId pauseTextBellotaId = { 0 };
 Nothofagus::BellotaId resumeTextBellotaId = { 0 };
@@ -48,8 +50,8 @@ void setup()
     Nothofagus::TextureId backgroundTextureId = Game::canvas.addTexture(backgroundTexture);
     Nothofagus::BellotaId backgoundBellotaId = Game::canvas.addBellota({ {{Game::CANVAS_WIDTH/2, Game::CANVAS_HEIGHT/2}}, backgroundTextureId, 0});
 
-    setupPause();
     setupController();
+    setupPause();
     setupEntities();
 }
 

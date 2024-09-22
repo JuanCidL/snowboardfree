@@ -2,6 +2,7 @@
 #include <nothofagus.h>
 #include <iostream>
 #include "game.h"
+#include "piano.h"
 
 namespace Entity
 {
@@ -355,6 +356,7 @@ void PlayerEntity::jump()
         isJumping = true;
         maxJumpVelocity = Game::velocity.y + 9.0f;
         jumpHeight = 0.0f;
+        Piano::sounds["jump"]->play();
     }
 
 }

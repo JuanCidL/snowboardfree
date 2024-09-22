@@ -1,31 +1,20 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include <rusty_audio.h>
 
 namespace Piano
 {
 
-class Key
-{
-public:
-	static Key& getInstance();
-	static const float getKey(std::string key);
+constexpr unsigned int sampleRate = 48000;
+constexpr unsigned int channels = 2;
 
-private:
-	Key();
-	static Key* instance;
-	static std::unordered_map<std::string, float> keys;
-	static void init();
-};
+extern std::unordered_map<std::string, float> keys;
 
-class Piano
-{
-public:
-	Piano()
-	{
+extern std::unordered_map<std::string, std::unique_ptr<RustyAudio::Player>> sounds;
 
-	}
-};
+void addSound(std::string key, std::unique_ptr<RustyAudio::Player> sound);
+
 
 }
 

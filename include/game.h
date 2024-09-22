@@ -3,9 +3,11 @@
 #include <vector>
 #include <random>
 #include <string>
+#include "piano.h"
 #include "player.h"
 #include "obstacles.h"
 #include "sign.h"
+
 
 namespace Game{
 
@@ -46,6 +48,7 @@ extern std::uniform_real_distribution<float> disX;
 extern std::uniform_real_distribution<float> disY;
 
 extern void setup();
+extern void setupSounds();
 extern void setupController();
 extern void setupEntities();
 extern void setupPause();

@@ -24,6 +24,13 @@ const glm::vec2& StaticEntity::position() const
     return Game::canvas.bellota(this->bellotaId).transform().location();
 };
 
+void StaticEntity::reset()
+{
+    Game::canvas.bellota(this->bellotaId).transform().location().x = Game::disX(Game::gen);
+    Game::canvas.bellota(this->bellotaId).transform().location().y = Game::disY(Game::gen);
+    canCollide = true;
+};
+
 void StaticEntity::update(float dt)
 {
     auto& bellota = Game::canvas.bellota(this->bellotaId);

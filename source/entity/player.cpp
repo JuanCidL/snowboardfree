@@ -163,7 +163,7 @@ PlayerEntity::PlayerEntity() :
 
     ), leftKeyPressed(false), rightKeyPressed(false), downKeyPressed(false),
     maxVelocity({13.0f, 18.0f}), acceleration(4.2f), deceleration(5.0f),
-    isJumping(false), jumpVelocity(0.0f), maxJumpVelocity(9.0f), jumpHeight(0.0f),
+    isJumping(false), maxJumpVelocity(9.0f), jumpHeight(0.0f),
     crashTime(1000.0f), crashDuration(1000.0f)
 {
     _boundingBox.leftBottomCorner() = {-5.0f, -4.0f};
@@ -176,11 +176,23 @@ void PlayerEntity::setupController(Nothofagus::Controller& controller)
     {
         leftKeyPressed = true;
     });
+    controller.registerAction({ Nothofagus::Key::LEFT, Nothofagus::DiscreteTrigger::Press }, [&]()
+    {
+        leftKeyPressed = true;
+    });
     controller.registerAction({ Nothofagus::Key::S, Nothofagus::DiscreteTrigger::Press }, [&]()
     {
         downKeyPressed = true;
     });
+    controller.registerAction({ Nothofagus::Key::DOWN, Nothofagus::DiscreteTrigger::Press }, [&]()
+    {
+        downKeyPressed = true;
+    });
     controller.registerAction({ Nothofagus::Key::D, Nothofagus::DiscreteTrigger::Press }, [&]()
+    {
+        rightKeyPressed = true;
+    });
+    controller.registerAction({ Nothofagus::Key::RIGHT, Nothofagus::DiscreteTrigger::Press }, [&]()
     {
         rightKeyPressed = true;
     });
@@ -189,11 +201,23 @@ void PlayerEntity::setupController(Nothofagus::Controller& controller)
     {
         leftKeyPressed = false;
     });
+    controller.registerAction({ Nothofagus::Key::LEFT, Nothofagus::DiscreteTrigger::Release }, [&]()
+    {
+        leftKeyPressed = false;
+    });
     controller.registerAction({ Nothofagus::Key::S, Nothofagus::DiscreteTrigger::Release }, [&]()
     {
         downKeyPressed = false;
     });
+    controller.registerAction({ Nothofagus::Key::DOWN, Nothofagus::DiscreteTrigger::Release }, [&]()
+    {
+        downKeyPressed = false;
+    });
     controller.registerAction({ Nothofagus::Key::D, Nothofagus::DiscreteTrigger::Release }, [&]()
+    {
+        rightKeyPressed = false;
+    });
+    controller.registerAction({ Nothofagus::Key::RIGHT, Nothofagus::DiscreteTrigger::Release }, [&]()
     {
         rightKeyPressed = false;
     });
@@ -207,11 +231,12 @@ void PlayerEntity::update(float dt)
         return;
     }
     if (isJumping){
-        if (jumpVelocity < maxJumpVelocity)
-            jumpVelocity += acceleration * dt / 1000;
+        if (Game::velocity.y < maxJumpVelocity)
+            Game::velocity.y += acceleration * dt / 1000;
         else
-            jumpVelocity = maxJumpVelocity;
-        jumpHeight += dt / (Game::velocity.y * 50);
+            Game::velocity.y = maxJumpVelocity;
+        jumpHeight += dt / (Game::velocity.y * 40);
+
         if (jumpHeight > 3.14159)
         {
             Game::canvas.bellota(currentBellotaId).transform().scale().y = 1;
@@ -224,7 +249,7 @@ void PlayerEntity::update(float dt)
         Game::canvas.bellota(currentBellotaId).transform().scale().y = 1 + 0.2*sin(jumpHeight);
         Game::canvas.bellota(currentBellotaId).transform().scale().x = (1 + 0.5 * sin(jumpHeight)) *
             Game::canvas.bellota(currentBellotaId).transform().scale().x/abs(Game::canvas.bellota(currentBellotaId).transform().scale().x);
-        Game::canvas.bellota(currentBellotaId).transform().location().y = Game::playerPosition.y + 10 * Game::velocity.y * sin(jumpHeight);
+        Game::canvas.bellota(currentBellotaId).transform().location().y = Game::playerPosition.y + 8 * Game::velocity.y * sin(jumpHeight);
         return;
     }
     if (leftKeyPressed && rightKeyPressed) return;
@@ -328,7 +353,7 @@ void PlayerEntity::jump()
     {
         canCollide = false;
         isJumping = true;
-        jumpVelocity = 0.0f;
+        maxJumpVelocity = Game::velocity.y + 9.0f;
         jumpHeight = 0.0f;
     }
 

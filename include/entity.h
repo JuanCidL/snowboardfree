@@ -47,6 +47,7 @@ public:
     bool checkCollision(const Entity& other) const;
     virtual const glm::vec2& position() const;
     virtual const BoundingBox& boundingBox() const;
+    virtual void reset();
     bool canCollide;
 
 protected:
@@ -64,6 +65,7 @@ public:
         std::initializer_list<std::uint8_t> sprite);
 
     void update(float dt) override;
+    void reset() override;
     const glm::vec2& position() const override;
     
 protected:

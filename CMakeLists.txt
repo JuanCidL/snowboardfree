@@ -12,6 +12,7 @@ add_executable(skifri
     "source/piano.cpp"
     "source/main.cpp"
     "source/game.cpp"
+    "source/sign.cpp"
     "source/entity/entity.cpp"
     "source/entity/animated_entity.cpp"
     "source/entity/static_entity.cpp"

@@ -26,7 +26,6 @@ private:
     float acceleration;
     float deceleration;
     bool isJumping;
-    float jumpVelocity;
     float maxJumpVelocity;
     float jumpHeight;
     float crashTime;

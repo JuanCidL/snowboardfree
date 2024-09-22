@@ -39,14 +39,7 @@ int main()
 
     // Nothofagus
 
-    Nothofagus::Controller controller;
-
-    Game::player.setupController(controller);
-
-    Nothofagus::Texture backgroundTexture({ Game::CANVAS_WIDTH, Game::CANVAS_HEIGHT }, { 1.0f, 1.0f, 1.0f, 1.0f });
-    Nothofagus::TextureId backgroundTextureId = Game::canvas.addTexture(backgroundTexture);
-    Nothofagus::BellotaId backgoundBellotaId = Game::canvas.addBellota({ {{Game::CANVAS_WIDTH/2, Game::CANVAS_HEIGHT/2}}, backgroundTextureId, 0});
-
+    
     float time = 0.0f;
 
     Game::setup();
@@ -54,22 +47,15 @@ int main()
     auto update = [&](float dt)
         {
             time += dt;
-
-            // Nothofagus::Bellota& bellota3 = canvas.bellota(bellotaId3);
-            // bellota3.transform().angle() = 5.0f * std::sin(0.005f * time);
-
-            // Nothofagus::Bellota& bellotaRGB = canvas.bellota(bellotaIdRGB);
-            // bellotaRGB.transform().scale().y = 2.0f + 1.5f * std::sin(0.01f * time);
-            // bellotaRGB.transform().angle() = 5.0f * std::sin(0.005f * time);
-            Game::player.update(dt);
             std::cout<<Game::velocity.y<<std::endl;
             Game::update(dt);
+            Game::setupGui();
         };
 
     /*soundPlayer.setLooping(true);
     soundPlayer.play();*/
 
-    Game::canvas.run(update, controller);
+    Game::canvas.run(update, Game::controller);
     
     return 0;
 }

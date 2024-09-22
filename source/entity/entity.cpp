@@ -23,6 +23,8 @@ const glm::vec2& Entity::position() const { return _position; };
 
 const BoundingBox& Entity::boundingBox() const { return _boundingBox; };
 
+void Entity::reset() {};
+
 void Entity::update(float dt) {};
 
 }

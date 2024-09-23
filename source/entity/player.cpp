@@ -369,6 +369,7 @@ void PlayerEntity::crash()
     Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
     currentBellotaId = this->bellotaIds[3];
     Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+    Piano::sounds["crash"]->play();
 }
 
 }

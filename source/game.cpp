@@ -29,6 +29,8 @@ Nothofagus::Controller controller;
 
 Entity::PlayerEntity player;
 
+Entity::Yeti yeti({ 100, 100 });
+
 int rampCount = 20;
 std::vector<Entity::Ramp> ramps;
 int treeCount = 30;

@@ -5,6 +5,7 @@
 #include <string>
 #include "piano.h"
 #include "player.h"
+#include "yeti.h"
 #include "obstacles.h"
 #include "sign.h"
 
@@ -31,6 +32,8 @@ extern std::vector<Sign> signs;
 extern Nothofagus::Controller controller;
 
 extern Entity::PlayerEntity player;
+
+extern Entity::Yeti yeti;
 
 extern int rampCount;
 extern std::vector<Entity::Ramp> ramps;

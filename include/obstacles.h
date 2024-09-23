@@ -4,12 +4,6 @@
 namespace Entity
 {
 
-enum class Obstacle
-{
-    Ramp,
-    Tree
-};
-
 class Ramp: public StaticEntity
 {
 public:

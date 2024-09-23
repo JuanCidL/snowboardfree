@@ -19,6 +19,7 @@ add_executable(skifri
     "source/entity/ramp.cpp"
     "source/entity/tree.cpp"
     "source/entity/player.cpp"
+    "source/entity/yeti.cpp"
     
     ${HEADERS}
 )

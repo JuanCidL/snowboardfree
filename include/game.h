@@ -13,11 +13,15 @@
 namespace Game{
 
 extern bool paused;
+extern bool end;
 
 extern Nothofagus::BellotaId pauseBackgroundBellotaId;
 extern Nothofagus::BellotaId pauseTextBellotaId;
 extern Nothofagus::BellotaId resumeTextBellotaId;
 extern Nothofagus::BellotaId restartTextBellotaId;
+
+extern float ellapsedTime;
+extern int gameTime;
 
 extern const unsigned int CANVAS_WIDTH ;
 extern const unsigned int CANVAS_HEIGHT ;
@@ -49,6 +53,7 @@ extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<float> disX;
 extern std::uniform_real_distribution<float> disY;
+extern std::uniform_int_distribution<int> disGameTime;
 
 extern void setup();
 extern void setupSounds();

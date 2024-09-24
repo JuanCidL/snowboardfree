@@ -14,9 +14,13 @@ public:
 
     void update(float dt) override;
 
+    void reset() override;
+
     void jump();
     
     void crash();
+
+    void die();
 
 private:
     bool leftKeyPressed;
@@ -30,6 +34,7 @@ private:
     float jumpHeight;
     float crashTime;
     float crashDuration;
+    bool canMove;
 };
 
 }

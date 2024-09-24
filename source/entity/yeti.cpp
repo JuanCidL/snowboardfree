@@ -1,4 +1,5 @@
 #include "yeti.h"
+#include "game.h"
 
 namespace Entity
 {
@@ -353,26 +354,110 @@ Yeti::Yeti(glm::vec2 position) :
             12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
             }
         }),
-    stepTime(0.0f),
-    stepDuration(0.5f)
+    stepTime(0.0f), stepDuration(250.0f), walking(false), walkSpeed(0.2f),
+    eatTime(0.0f), eatDuration(3000.0f), eating(false)
 {
     _boundingBox.leftBottomCorner() = {-10.0f, -22.0f};
     _boundingBox.rightTopCorner() = {10.0f, -10.0f};
+    glm::vec2 dir = glm::vec2{ Game::playerPosition.x, Game::playerPosition.y + 16 } - Game::canvas.bellota(bellotaIds[0]).transform().location();
+    glm::vec2 ndir = dir / (float)sqrt((float)pow(dir.x, 2) + pow((float)dir.y, 2));
+    walkDirection = ndir;
+    pos = glm::vec2{ position.x, position.y };
 };
 
-void Yeti::update(float deltaTime)
+void Yeti::update(float dt)
 {
-
-};
+    if (Game::ellapsedTime > Game::gameTime && !walking)
+        walking = true;
+    if (eating)
+        eatAnim(dt);
+    else
+        walk(dt);
+}
 
 void Yeti::reset()
 {
+    Game::canvas.bellota(currentBellotaId).transform().location() = pos;
+    eating = false;;
+    walking = false;
+}
 
-};
+
+void Yeti::walk(float dt)
+{
+    if (walking)
+    {
+        stepTime += dt;
+        if (stepTime >= stepDuration)
+        {
+            stepTime = 0.0f;
+            if (currentBellotaId.id == bellotaIds[0].id)
+            {
+                Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+                glm::vec2 pos = Game::canvas.bellota(currentBellotaId).transform().location();
+                currentBellotaId = bellotaIds[1];
+                Game::canvas.bellota(currentBellotaId).transform().location() = pos;
+                Game::canvas.bellota(currentBellotaId).depthOffset() = 11;
+            }
+            else if (currentBellotaId.id == bellotaIds[1].id)
+            {
+                Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+                glm::vec2 pos = Game::canvas.bellota(currentBellotaId).transform().location();
+                currentBellotaId = bellotaIds[0];
+                Game::canvas.bellota(currentBellotaId).transform().location() = pos;
+                Game::canvas.bellota(currentBellotaId).depthOffset() = 11;
+            }
+        }
+        if (Game::canvas.bellota(currentBellotaId).transform().location().x > Game::playerPosition.x - 10 &&
+            !Game::end) return;
+        Game::canvas.bellota(currentBellotaId).transform().location() += walkDirection * walkSpeed * dt;
+    }
+
+}
 
 void Yeti::eat()
 {
+    walking = false;
+    eating = true;
+    eatTime = 0;
+}
 
-};
+void Yeti::eatAnim(float dt)
+{
+    glm::vec2 pos = Game::canvas.bellota(currentBellotaId).transform().location();
+    if (eatTime < eatDuration / 4.0f && (currentBellotaId.id == bellotaIds[1].id || currentBellotaId.id == bellotaIds[0].id))
+    {
+        Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+        currentBellotaId = bellotaIds[2];
+        Game::canvas.bellota(currentBellotaId).depthOffset() = 11;
+        Game::canvas.bellota(currentBellotaId).transform().location() = pos;
+    }
+    else if (eatTime > eatDuration * 2.0f / 4.0f && (currentBellotaId.id == bellotaIds[2].id))
+    {
+        Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+        currentBellotaId = bellotaIds[3];
+
+        Game::canvas.bellota(currentBellotaId).depthOffset() = 11;
+        Game::canvas.bellota(currentBellotaId).transform().location() = pos;
+    }
+    else if (eatTime > eatDuration * 3.0f / 4.0f && (currentBellotaId.id == bellotaIds[3].id))
+    {
+        Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+        currentBellotaId = bellotaIds[4];
+        Game::canvas.bellota(currentBellotaId).depthOffset() = 11;
+        Game::canvas.bellota(currentBellotaId).transform().location() = pos;
+    }
+    else if (eatTime > eatDuration)
+    {
+        Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+        currentBellotaId = bellotaIds[0];
+        Game::canvas.bellota(currentBellotaId).depthOffset() = 11;
+        Game::canvas.bellota(currentBellotaId).transform().location() = pos;
+        eating = false;
+        walking = true;
+    }
+    eatTime += dt;
+
+}
 
 }

@@ -44,14 +44,10 @@ int main()
     crashSoundPlayer->init(crashSoundBuffer);
     Piano::addSound("crash", std::move(crashSoundPlayer));
     
-
-
     
     float time = 0.0f;
 
     Game::setup();
-
-    // Game::piano.playSound("jump");
 
     auto update = [&](float dt)
         {

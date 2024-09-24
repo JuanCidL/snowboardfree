@@ -3,6 +3,7 @@
 namespace Game {
 
 bool paused = false;
+bool end = false;
 
 std::unordered_map<std::string, std::unique_ptr<RustyAudio::Player>> sounds;
 
@@ -10,6 +11,9 @@ Nothofagus::BellotaId pauseBackgroundBellotaId = { 0 };
 Nothofagus::BellotaId pauseTextBellotaId = { 0 };
 Nothofagus::BellotaId resumeTextBellotaId = { 0 };
 Nothofagus::BellotaId restartTextBellotaId = { 0 };
+
+float ellapsedTime = 0.0f;
+int gameTime;
 
 const unsigned int CANVAS_WIDTH = 896;
 const unsigned int CANVAS_HEIGHT = 504;
@@ -29,7 +33,7 @@ Nothofagus::Controller controller;
 
 Entity::PlayerEntity player;
 
-Entity::Yeti yeti({ 100, 100 });
+Entity::Yeti yeti({ -32, CANVAS_HEIGHT+48 });
 
 int rampCount = 20;
 std::vector<Entity::Ramp> ramps;
@@ -45,6 +49,7 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<float> disX(minX, maxX);
 std::uniform_real_distribution<float> disY(minY, maxY);
+std::uniform_int_distribution<int> disGameTime(0, 2*60*1000);
 
 void setup()
 {
@@ -55,20 +60,28 @@ void setup()
     setupController();
     setupPause();
     setupEntities();
+    gameTime = 2*60*1000 + disGameTime(gen);
 }
 
 void setupController()
 {
     controller.registerAction({ Nothofagus::Key::ENTER, Nothofagus::DiscreteTrigger::Press }, [&]()
     {
+        if (end) return;
         paused = !paused; 
         if (paused) showPause();
         else hidePause();
     });
     controller.registerAction({ Nothofagus::Key::W, Nothofagus::DiscreteTrigger::Press }, [&]()
     {
-        if (paused){
+        if (paused)
+        {
             hidePause();
+            restart();
+        }
+        if (end)
+        {
+            canvas.bellota(restartTextBellotaId).depthOffset() = -1;
             restart();
         }
     });
@@ -130,8 +143,12 @@ void setupPause()
 
 void setupGui()
 {
+    std::string formatedTime = ellapsedTime < 60*1000 ?
+        std::to_string((int)ellapsedTime/1000) + "s" :
+        std::to_string((int)ellapsedTime/60000) + "m, " + std::to_string((int)(ellapsedTime/1000)%60) + "s";
     ImGui::Begin("Stats");
     ImGui::Text("Player velocity: %i", (int) velocity.y);
+    ImGui::Text("Ellapsed time: %s", formatedTime.c_str());
     ImGui::End();
 }
 
@@ -153,20 +170,25 @@ void hidePause()
 
 void restart()
 {
-    paused = false;
-    velocity = { 0.0f, 0.0f };
+    yeti.reset();
+    player.reset();
     for (auto& sign : signs)
         sign.reset();
     for (auto& ramp : ramps)
         ramp.reset();
     for (auto& tree : trees)
         tree.reset();
+    paused = false;
+    end = false;
+    ellapsedTime = 0.0f;
+    gameTime = 2 * 60 * 1000 + disGameTime(gen);
 }
 
 void update(float dt)
 {
     if (paused) return;
     player.update(dt);
+    yeti.update(dt);
     for (auto& sign : signs)
         sign.update(dt);
     for (auto& ramp : ramps)
@@ -184,6 +206,15 @@ void update(float dt)
             player.crash();
         }
     }
+    if (yeti.checkCollision(player))
+    {
+        yeti.eat();
+        player.die();
+    }
+    if (end)
+        canvas.bellota(restartTextBellotaId).depthOffset() = 15;
+    if (end) return;
+    ellapsedTime += dt;
 }
 
 } 

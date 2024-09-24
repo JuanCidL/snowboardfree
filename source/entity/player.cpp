@@ -199,7 +199,8 @@ PlayerEntity::PlayerEntity() :
     ), leftKeyPressed(false), rightKeyPressed(false), downKeyPressed(false),
     maxVelocity({13.0f, 18.0f}), acceleration(4.2f), deceleration(5.0f),
     isJumping(false), maxJumpVelocity(9.0f), jumpHeight(0.0f),
-    crashTime(1000.0f), crashDuration(1000.0f)
+    crashTime(1000.0f), crashDuration(1000.0f),
+    canMove(true)
 {
     _boundingBox.leftBottomCorner() = {-5.0f, -4.0f};
     _boundingBox.rightTopCorner() = {5.0f, 4.0f};
@@ -260,6 +261,7 @@ void PlayerEntity::setupController(Nothofagus::Controller& controller)
 
 void PlayerEntity::update(float dt)
 {
+    if (!canMove) return;
     if (crashTime < crashDuration)
     {
         crashTime += dt;
@@ -279,6 +281,7 @@ void PlayerEntity::update(float dt)
             Game::canvas.bellota(currentBellotaId).transform().location().y = Game::playerPosition.y;
             canCollide = true;
             isJumping = false;
+            Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
             return;
         }
         Game::canvas.bellota(currentBellotaId).transform().scale().y = 1 + 0.2*sin(jumpHeight);
@@ -382,6 +385,17 @@ void PlayerEntity::update(float dt)
     }
 }
 
+void PlayerEntity::reset()
+{
+    canMove = true;
+    Game::velocity.x = 0;
+    Game::velocity.y = 0;
+    canCollide = true;
+    leftKeyPressed = false;
+    downKeyPressed = false;
+    rightKeyPressed = false;
+}
+
 void PlayerEntity::jump()
 {
     if (!isJumping)
@@ -390,6 +404,7 @@ void PlayerEntity::jump()
         isJumping = true;
         maxJumpVelocity = Game::velocity.y + 9.0f;
         jumpHeight = 0.0f;
+        Game::canvas.bellota(currentBellotaId).depthOffset() = 11;
         Piano::sounds["jump"]->play();
     }
 
@@ -404,6 +419,18 @@ void PlayerEntity::crash()
     currentBellotaId = this->bellotaIds[3];
     Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
     Piano::sounds["crash"]->play();
+}
+
+void PlayerEntity::die()
+{
+    canMove = false;
+    canCollide = false;
+    Game::velocity.x = 0;
+    Game::velocity.y = 0;
+    Game::canvas.bellota(currentBellotaId).depthOffset() = -1;
+    currentBellotaId = this->bellotaIds[4];
+    Game::canvas.bellota(currentBellotaId).depthOffset() = 5;
+    Game::end = true;
 }
 
 }
